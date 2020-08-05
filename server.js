@@ -6,7 +6,7 @@ const app = express();
 app.use(morgan("dev"));
 
 app.use((req, res) => {
-  res.send("Hello, Amy!");
+  res.send("Hello, word!");
 });
 
 const PORT = 8000;
