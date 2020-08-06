@@ -1,6 +1,8 @@
 const express = require("express");
 const morgan = require("morgan");
+const MOVIEDEX = require("./movies-data-small.json");
 require("dotenv").config();
+
 const app = express();
 
 const movies = [
@@ -27,6 +29,6 @@ function handleGetReq(req, res) {
   res.send(movies);
 }
 
-app.get("/movies", handleGetReq);
+app.get("/movie", handleGetReq);
 
 module.exports = app;
