@@ -5,12 +5,6 @@ require("dotenv").config();
 
 const app = express();
 
-const movies = [
-  { title: "The Big Lebowski" },
-  { title: "A Bug's Life" },
-  { title: "Gravity" },
-];
-
 app.use(morgan("dev"));
 
 app.use(function validateBearerToken(req, res, next) {
@@ -26,7 +20,20 @@ app.use(function validateBearerToken(req, res, next) {
 });
 
 function handleGetReq(req, res) {
-  res.send(movies);
+  const { genre } = req.query;
+  const { country } = req.query;
+  const { avg_vote } = req.query;
+
+  let results;
+
+  const searchResults = function () {
+    if (genre) {
+      results = MOVIEDEX.filter((movie) => movie.genre.toLowerCase() === genre);
+    }
+    return results;
+  };
+
+  res.json(searchResults()).send();
 }
 
 app.get("/movie", handleGetReq);
