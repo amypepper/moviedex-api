@@ -1,13 +1,5 @@
-const express = require("express");
-const morgan = require("morgan");
-
-const app = express();
-
-app.use(morgan("dev"));
-
-app.use((req, res) => {
-  res.send("Hello, Amy!");
-});
+const app = require("./app");
+require("dotenv").config();
 
 const PORT = 8000;
 
