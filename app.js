@@ -2,13 +2,17 @@ const express = require("express");
 const morgan = require("morgan");
 const MOVIEDEX = require("./movies-data-small.json");
 require("dotenv").config();
+const helmet = require("helmet");
+const cors = require("cors");
 
 const app = express();
 
-app.use(morgan("dev"));
+const morganSetting = process.env.NODE_ENV === "production" ? "tiny" : "common";
 
+app.use(morgan(morganSetting));
+app.use(helmet());
+app.use(cors());
 app.use(function validateBearerToken(req, res, next) {
-  console.log("validate bearer token middleware");
   const authToken = req.get("Authorization");
   const apiToken = process.env.API_TOKEN;
 
@@ -18,6 +22,17 @@ app.use(function validateBearerToken(req, res, next) {
   // move to the next middleware
   next();
 });
+app.use((error, req, res, next) => {
+  let response;
+  if (process.env.NODE_ENV === "production") {
+    response = { error: { message: "server error" } };
+  } else {
+    response = { error: { message: "server error" } };
+  }
+  res.status(500).json(response);
+
+  next();
+});
 
 function handleGetReq(req, res) {
   const { genre } = req.query;
@@ -25,6 +40,15 @@ function handleGetReq(req, res) {
   const { avg_vote } = req.query;
 
   let results;
+
+  if (!genre) {
+    return res
+      .status(400)
+      .send("Please include a genre parameter with a value that is a string.");
+  }
+  if (genre.match(/[0-9]/g)) {
+    return res.status(400).send("Please use a value that is a string.");
+  }
 
   const searchResults = function () {
     if (genre) {
