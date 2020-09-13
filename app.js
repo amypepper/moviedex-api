@@ -39,24 +39,42 @@ function handleGetReq(req, res) {
   const { country } = req.query;
   const { avg_vote } = req.query;
 
-  let results;
+  let results = MOVIEDEX;
 
-  if (!genre) {
-    return res
-      .status(400)
-      .send("Please include a genre parameter with a value that is a string.");
+  if (genre) {
+    if (genre.match(/[0-9]/g)) {
+      return res.status(400).send("The genre must be only letters.");
+    }
   }
-  if (genre.match(/[0-9]/g)) {
-    return res.status(400).send("Please use a value that is a string.");
+  if (country) {
+    if (country.match(/[0-9]/g)) {
+      return res.status(400).send("The country name must be only letters.");
+    }
+  }
+  if (avg_vote) {
+    const number = parseInt(avg_vote, 10);
+    if (!Number.isInteger(number)) {
+      return res.status(400).send("The average vote must be a number.");
+    }
   }
 
-  const searchResults = function () {
+  const searchResults = () => {
     if (genre) {
-      results = MOVIEDEX.filter((movie) => movie.genre.toLowerCase() === genre);
+      results = results.filter(
+        (movie) => movie.genre.toLowerCase() === genre.toLowerCase()
+      );
+    }
+    if (country) {
+      results = results.filter(
+        (movie) => movie.country.toLowerCase() === country.toLowerCase()
+      );
+    }
+    if (avg_vote) {
+      const number = parseInt(avg_vote, 10);
+      results = results.filter((movie) => movie.avg_vote >= number);
     }
     return results;
   };
-
   res.json(searchResults()).send();
 }
 
